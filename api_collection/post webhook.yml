@@ -1,0 +1,42 @@
+info:
+  name: post webhook
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://127.0.0.1:8001/webhook
+  body:
+    type: json
+    data: |-
+      {
+        "object": "whatsapp_business_account",
+        "entry": [
+          {
+            "changes": [
+              {
+                "value": {
+                  "messages": [
+                    {
+                      "from": "557400000000",
+                      "type": "text",
+                      "text": {
+                        "body": "comprei pão"
+                      }
+                    }
+                  ]
+                },
+                "field": "messages"
+              }
+            ]
+          }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
