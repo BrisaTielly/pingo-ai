@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="frontend/images/mascots/pingo-penguin-accomplice-study.png" alt="Pingo, o pinguim mascote do projeto, em três poses" width="520">
+<img src=".github/assets/pingo-mascote.png" alt="Pingo, o pinguim mascote do projeto, em três poses" width="520">
 
 # Pingo - Em desenvolvimento...
 
@@ -38,7 +38,7 @@ Essas escolhas ainda podem mudar conforme eu for entendendo melhor as necessidad
 ## A cara do Pingo
 
 <div align="center">
-<img src="frontend/images/mascots/pingo-penguin-natural-2d.png" alt="Pingo em quatro poses do dia a dia" width="420">
+<img src=".github/assets/pingo-poses.png" alt="Pingo em quatro poses do dia a dia" width="420">
 </div>
 
 Ele é camarada, não fiscal. Entende que você escreve com pressa, não corrige seu português e não transforma um almoço de 32 reais em lição de moral. Acompanha, que já é bastante.
