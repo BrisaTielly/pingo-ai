@@ -25,18 +25,8 @@ def read_webhook(challenge: str = Query(alias="hub.challenge"), mode: str = Quer
 
 @app.post("/webhook")
 def receive_webhook(payload: dict):
-    entry = payload["entry"][0]
-    changes = entry["changes"][0]
-    value = changes["value"]
-    if "messages" in value:
-        message = value["messages"][0]
-        text = message["text"]
-        body = text["body"]
-        return extract_expense(body, client)
-    if "statuses" in value:
-        status = value["statuses"][0]
-        return status
-
-    return {"status": "ignored"}
-
+    body = payload["message"]["text"]["body"]
+    response = extract_expense(body, client)
+    print(response)
+    return response
 
