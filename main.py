@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Query, HTTPException, Response
+from fastapi import FastAPI, Query, HTTPException, Response, BackgroundTasks
 from dotenv import load_dotenv
 from google import genai
 from expense_extractor import extract_expense
@@ -27,10 +27,14 @@ def read_webhook(challenge: str = Query(alias="hub.challenge"), mode: str = Quer
     raise HTTPException(status_code=403, detail="Verificação Inválida")
 
 @app.post("/webhook")
-def receive_webhook(payload: dict):
+def receive_webhook(payload: dict, background_tasks: BackgroundTasks):
+    background_tasks.add_task(process_message, payload)
+    return {"status": "received"}
+    
+    
+def process_message(payload: dict) -> None:
     body = payload["message"]["text"]["body"]
     recipient = payload["message"]["from"]
     response = extract_expense(body, client)
     response_text = f"R$ {response.amount:.2f} - {response.description}"
-    return send_message(recipient, response_text, kapso_api_key, kapso_phone_number_id)
-    
+    send_message(recipient, response_text, kapso_api_key, kapso_phone_number_id)
