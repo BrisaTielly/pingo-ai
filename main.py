@@ -3,10 +3,13 @@ from fastapi import FastAPI, Query, HTTPException, Response
 from dotenv import load_dotenv
 from google import genai
 from expense_extractor import extract_expense
-
+from whatsapp_sender import send_message
 load_dotenv()
 
 expected_verify_token = os.getenv("WEBHOOK_VERIFY_TOKEN")
+kapso_api_key = os.getenv("KAPSO_API_KEY")
+kapso_phone_number_id = os.getenv("KAPSO_PHONE_NUMBER_ID")
+
 
 client = genai.Client()
 
@@ -26,7 +29,8 @@ def read_webhook(challenge: str = Query(alias="hub.challenge"), mode: str = Quer
 @app.post("/webhook")
 def receive_webhook(payload: dict):
     body = payload["message"]["text"]["body"]
+    recipient = payload["message"]["from"]
     response = extract_expense(body, client)
-    print(response)
-    return response
-
+    response_text = f"R$ {response.amount:.2f} - {response.description}"
+    return send_message(recipient, response_text, kapso_api_key, kapso_phone_number_id)
+    
