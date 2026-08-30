@@ -10,7 +10,6 @@ expected_verify_token = os.getenv("WEBHOOK_VERIFY_TOKEN")
 kapso_api_key = os.getenv("KAPSO_API_KEY")
 kapso_phone_number_id = os.getenv("KAPSO_PHONE_NUMBER_ID")
 
-
 client = genai.Client()
 
 app = FastAPI()
