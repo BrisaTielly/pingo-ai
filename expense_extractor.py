@@ -1,7 +1,8 @@
 from pydantic import BaseModel
+from decimal import Decimal
 
 class ExpenseExtraction(BaseModel):
-    amount: float | None
+    amount: Decimal | None
     description: str | None
     needs_confirmation: bool
 

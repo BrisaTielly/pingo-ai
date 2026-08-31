@@ -4,6 +4,11 @@ from dotenv import load_dotenv
 from google import genai
 from expense_extractor import extract_expense
 from whatsapp_sender import send_message
+from sqlalchemy.orm import Session
+from decimal import Decimal
+from database import engine
+from models import Transaction
+
 load_dotenv()
 
 expected_verify_token = os.getenv("WEBHOOK_VERIFY_TOKEN")
@@ -36,4 +41,15 @@ def process_message(payload: dict) -> None:
     recipient = payload["message"]["from"]
     response = extract_expense(body, client)
     response_text = f"R$ {response.amount:.2f} - {response.description}"
+    save_transaction(Decimal(response.amount), response.description, recipient)
     send_message(recipient, response_text, kapso_api_key, kapso_phone_number_id)
+
+def save_transaction(amount: Decimal, description: str, phone_number: str) -> None:
+    with Session(engine) as session:
+        transaction = Transaction(
+            amount=amount,
+            description=description,
+            phone_number=phone_number
+        )
+        session.add(transaction)
+        session.commit()
