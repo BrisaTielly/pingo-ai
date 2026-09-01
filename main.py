@@ -1,13 +1,10 @@
 import os
-from fastapi import FastAPI, Query, HTTPException, Response, BackgroundTasks
+
 from dotenv import load_dotenv
+from fastapi import FastAPI, Query, HTTPException, Response, BackgroundTasks
 from google import genai
-from expense_extractor import extract_expense
-from whatsapp_sender import send_message
-from sqlalchemy.orm import Session
-from decimal import Decimal
-from database import engine
-from models import Transaction
+
+from expense_processor import process_message
 
 load_dotenv()
 
@@ -19,9 +16,11 @@ client = genai.Client()
 
 app = FastAPI()
 
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
 
 @app.get("/webhook")
 def read_webhook(challenge: str = Query(alias="hub.challenge"), mode: str = Query(alias="hub.mode"), verify_token: str = Query(alias="hub.verify_token")):
@@ -30,26 +29,8 @@ def read_webhook(challenge: str = Query(alias="hub.challenge"), mode: str = Quer
 
     raise HTTPException(status_code=403, detail="Verificação Inválida")
 
+
 @app.post("/webhook")
 def receive_webhook(payload: dict, background_tasks: BackgroundTasks):
-    background_tasks.add_task(process_message, payload)
+    background_tasks.add_task(process_message, payload, client, kapso_api_key, kapso_phone_number_id)
     return {"status": "received"}
-    
-    
-def process_message(payload: dict) -> None:
-    body = payload["message"]["text"]["body"]
-    recipient = payload["message"]["from"]
-    response = extract_expense(body, client)
-    response_text = f"R$ {response.amount:.2f} - {response.description}"
-    save_transaction(Decimal(response.amount), response.description, recipient)
-    send_message(recipient, response_text, kapso_api_key, kapso_phone_number_id)
-
-def save_transaction(amount: Decimal, description: str, phone_number: str) -> None:
-    with Session(engine) as session:
-        transaction = Transaction(
-            amount=amount,
-            description=description,
-            phone_number=phone_number
-        )
-        session.add(transaction)
-        session.commit()
